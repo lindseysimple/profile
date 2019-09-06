@@ -1,0 +1,115 @@
+.opblock {
+    margin: 0 0 15px;
+    border: 1px solid #000;
+    border-radius: 4px;
+    box-shadow: 0 0 3px rgba(0,0,0,.19);
+}
+
+.opblock.opblock-get {
+    border-color: #61affe;
+    background: rgba(97,175,254,.1);
+}
+
+.opblock.opblock-get .opblock-summary {
+    border-color: #61affe;
+}
+
+.opblock.opblock-get .opblock-summary-method {
+    background: #61affe;
+}
+
+.opblock .opblock-summary {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.opblock.opblock-post {
+    border-color: #49cc90;
+    background: rgba(73,204,144,.1);
+}
+
+.opblock.opblock-post .opblock-summary-method {
+    background: #49cc90;
+}
+
+.opblock-summary-path {
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    word-break: break-word;
+    padding: 0 10px;
+    font-family: monospace;
+    font-weight: 600;
+    color: #3b4151;
+}
+
+.rowDetail {
+    margin: 25px 45px;
+}
+
+.opblock .opblock-section-header {
+    display: flex;
+    align-items: center;
+    padding: 8px 20px;
+    min-height: 50px;
+    background: hsla(0,0%,100%,.8);
+    box-shadow: 0 1px 2px rgba(0,0,0,.1);
+}
+
+.opblock .tab-header {
+    display: flex;
+    flex: 1;
+}
+
+.opblock .opblock-section-header h4 {
+    font-size: 14px;
+    flex: 1;
+    margin: 0;
+    font-family: sans-serif;
+    color: #3b4151;
+}
+
+.opblock .opblock-section-header h4 {
+    font-size: 16px;
+    font-weight: 800;
+    flex: 1;
+    margin: 0;
+    font-family: sans-serif;
+    color: #3b4151;
+}
+
+.table-container {
+    padding: 20px;
+}
+
+.table-container table {
+    width: 100%;
+    padding: 0 10px;
+    border-collapse: collapse;
+}
+
+.table-container table thead tr td, .table-container table thead tr th {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 12px 0;
+    text-align: left;
+    border-bottom: 1px solid rgba(59,65,81,.2);
+    font-family: sans-serif;
+    color: #3b4151;
+}
+
+.table-container table tbody tr td:first-of-type {
+    max-width: 20%;
+    min-width: 6em;
+    padding: 10px 0;
+}
+
+.table-container .parameter__name {
+    font-size: 16px;
+    font-weight: 700;
+    margin-right: .75em;
+    font-family: sans-serif;
+    color: #3b4151;
+}
