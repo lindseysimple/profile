@@ -5,8 +5,8 @@ const pg = require('knex')({
   client: 'pg',
   connection: {
     host : '127.0.0.1',
-    user : 'pippa',
-    password : '',
+    user : 'lindsey',
+    password : 'lindsey',
     database : 'postgres'
   }  
 });
@@ -16,10 +16,9 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.get('/profiles', (req, res) => {
-  pg('profiles').select().returning('*').then(data => {
-    console.log(data);
-    res.json(data);
-  })
+  pg('profiles').select().returning('*')
+    .then(data => res.json(data))
+    .catch(err => res.status(500).json(err))
 });
 
 app.post('/profiles', (req, res) => {

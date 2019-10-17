@@ -7,10 +7,10 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 
 fetch('http://localhost:3006/profiles')
-  .then(response => response.json())
-  .then(data => {
-    const profiles = data.map(value => value['info']);
-    console.log('profiles', profiles);
+  .then(response =>
+    response.json()
+  ).then(data => {
+    const profiles = data ? data.map(value => JSON.parse(value['info'])) : [];
     setGlobal({
       name: '',
       description: '',
