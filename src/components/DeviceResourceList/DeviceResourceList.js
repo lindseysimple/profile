@@ -1,8 +1,11 @@
 import React, { useState, useGlobal } from 'reactn';
 
+import IconButton from '@material-ui/core/IconButton';
 import { makeStyles } from '@material-ui/core/styles';
+import Tooltip from '@material-ui/core/Tooltip';
 
-import MaterialTable from 'material-table';
+import PlaylistAddOutlinedIcon from '@material-ui/icons/PlaylistAddOutlined';
+import MaterialTable, { MTableToolbar } from 'material-table';
 
 import DeviceResourceForm from '../DeviceResourceForm/DeviceResourceForm';
 
@@ -24,6 +27,12 @@ const DeviceResourceList = () => {
 
   const [ rowData, setRowData ] = useState('');
 
+  const handleAdd = () => {
+    //setState(initialState);
+    //setRowIndex(-1);
+    setOpen(true);
+  }
+
   return (
     <div>
       <MaterialTable
@@ -33,6 +42,20 @@ const DeviceResourceList = () => {
           { title: 'Description', field: 'description' },
         ]}
         data={deviceResources}
+        components={{
+          Toolbar: props => (
+            <div className="toolbar">
+              <MTableToolbar {...props} />
+              <div className="toolbar-item">
+              <Tooltip title="Add Device Resource">
+                <IconButton aria-label="add" size="medium" className="iconButton" onClick={handleAdd}>
+                  <PlaylistAddOutlinedIcon fontSize="inherit" />
+                </IconButton>
+              </Tooltip>
+              </div>
+            </div>
+          ),
+        }}
         editable={{
           onRowDelete: oldData =>
             new Promise((resolve, reject) => {

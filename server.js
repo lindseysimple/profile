@@ -39,6 +39,12 @@ app.delete('/profiles/:name', (req, res) => {
       .catch(err => res.status(500).json(err));
 });
 
+app.post('/resources', (req, res) => {
+  pg('resources').insert({name: req.body.name, info: JSON.stringify(req.body)})
+    .then(data => res.json('success'))
+    .catch(err => res.status(500).json(err));
+});
+
 app.listen(3006, () => {
   console.log('app is runing on port 3006')
 })

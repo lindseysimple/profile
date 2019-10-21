@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import React, { setGlobal, useDispatch, useGlobal } from 'reactn';
 
-import Fab from '@material-ui/core/Fab';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Input from '@material-ui/core/Input';
@@ -90,12 +89,12 @@ const DeviceResourceForm = ({ rowData }) => {
   const [ rowIndex, setRowIndex ] = useState(-1);
   
   const [ deviceResources ] = useGlobal('deviceResources');
-  const [ open, setOpen ] = useGlobal('open');  
+  const [ open, setOpen ] = useGlobal('open');
 
-  useEffect(() => {    
-    if (rowData) {      
-      const { name, description, attributes, properties } = rowData;    
-      const { primaryTable, startingAddress } = attributes;      
+  useEffect(() => {
+    if (rowData) {
+      const { name, description, attributes, properties } = rowData;
+      const { primaryTable, startingAddress } = attributes;
       const { units, value } = properties;
       setState({
         name: name,
@@ -129,9 +128,9 @@ const DeviceResourceForm = ({ rowData }) => {
     setOpen(true);
   }
   
-  const handleClose = () =>setOpen(false)  
+  const handleClose = () => setOpen(false)  
   
-  const addResource = useDispatch(
+  const addDeviceRes = useDispatch(
     (deviceResources) =>  [...deviceResources, {
         name: name,
         description: description,
@@ -159,13 +158,50 @@ const DeviceResourceForm = ({ rowData }) => {
     ],
     'deviceResources',
   )
-  
+
+  const addResource = () => {
+const newResource = {
+        name: name,
+        description: description,
+        attributes: {
+          primaryTable: primaryTable,
+          startingAddress: startingAddress,
+        },
+        properties: {
+          value: {
+            type: dataType, 
+            readWrite: permission.join(''), 
+            size: size, 
+            scale: scale,
+            minimum: min,
+            maximum: max,
+            defaultValue: defaultVal
+          },
+          units: { 
+            type: "String", 
+            readWrite: "R", 
+            defaultValue: unit
+          }
+        }
+      }
+    addDeviceRes();
+    fetch('http://localhost:3006/resources', {
+      method: 'post',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(newResource)
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Insert device resource into DB successfully');
+      //backToList()
+    });
+  }
   return (
     <div>
       <Dialog        
         fullWidth={false}
         maxWidth="md"
-        open={open}
+        open={ open ? open : false }
         onClose={handleClose}
         aria-labelledby="max-width-dialog-title"
       >
@@ -209,7 +245,6 @@ const DeviceResourceForm = ({ rowData }) => {
                   <option value="COILS">COILS</option>
                   <option value="INPUT_REGISTERS">INPUT_REGISTERS</option>
                   <option value="INPUT_STATUS">INPUT_STATUS</option>
-             
                 </NativeSelect>             
               </FormControl>
             </Grid>
@@ -350,10 +385,6 @@ const DeviceResourceForm = ({ rowData }) => {
           </Grid>
         </DialogContent>  
       </Dialog>
-      <Fab variant="extended" color="primary" aria-label="add" className={classes.margin} onClick={handleAdd}>
-        <AddIcon className={classes.extendedIcon} />
-        Add Device Resource
-      </Fab>
     </div>
   );
 }

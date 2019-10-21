@@ -17,6 +17,8 @@ import JSZip from 'jszip';
 
 import ProfileForm from '../ProfileForm/ProfileForm';
 
+import './ProfileList.css';
+
 const DatatablePage = () => {
   const columns = [
     { title: 'Name', field: 'name' },

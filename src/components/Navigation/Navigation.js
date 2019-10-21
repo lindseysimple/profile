@@ -1,4 +1,11 @@
 import React from 'react';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
+
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -6,8 +13,11 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
-
+import List from '@material-ui/core/List';
 import ProfileList from '../ProfileList/ProfileList';
+import DeviceResourceList from '../DeviceResourceList/DeviceResourceList';
+
+import './Navigation.css';
 
 const TabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -50,6 +60,22 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+const routes = [
+  {
+    path: "/",
+    exact: true,    
+    main: () => <h2>Home</h2>
+  },
+  {
+    path: "/resources",
+    main: () => <DeviceResourceList />
+  },
+  {
+    path: "/profiles",
+    main: () => <ProfileList />
+  }
+];
+
 const Navigation = () => {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
@@ -59,31 +85,50 @@ const Navigation = () => {
   }
 
   return (
-    <div className={classes.root}>
-    <ProfileList />
-      {/*<AppBar position="static" color="default">
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          indicatorColor="primary"
-          textColor="primary"
-          variant="scrollable"
-          scrollButtons="auto"
-          aria-label="scrollable auto tabs example"
+    <Router>
+      <div style={{ display: "flex" }}>
+        <div className="sideBar"
+          style={{
+            padding: "10px",
+            width: "10%",
+            height: "100%",
+            background: "#f0f0f0"
+          }}
         >
-          <Tab label="View Profile" {...a11yProps(0)} />
-          {/*<Tab label="Export to YAML file" {...a11yProps(1)} />
-          
-        </Tabs>
-      </AppBar>
-      <TabPanel value={value} index={0}>
-        <ProfileList />
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        Item Two
-      </TabPanel>*/}
-      
-    </div>
+          <ul >
+            <li>
+              <Link to="/resources">Device Resource</Link>
+            </li>
+            <li>
+              <Link to="/profiles">Device Profile</Link>
+            </li>
+          </ul>
+
+          <Switch>
+            {routes.map((route, index) => (
+              <Route
+                key={index}
+                path={route.path}
+                exact={route.exact}
+              />
+            ))}
+          </Switch>
+        </div>
+
+        <div style={{ flex: 1, padding: "10px" }}>
+          <Switch>
+            {routes.map((route, index) => (
+              <Route
+                key={index}
+                path={route.path}
+                exact={route.exact}
+                children={<route.main />}
+              />
+            ))}
+          </Switch>
+        </div>
+      </div>
+    </Router>
   );
 }
 

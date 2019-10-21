@@ -1,0 +1,12 @@
+.sideBar ul {
+  list-style-type: none;
+}
+
+.sideBar li {
+  margin-top: 15px;
+  float: left;
+}
+
+.sideBar a {
+  text-decoration-line: none;
+}
