@@ -6,24 +6,35 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
-fetch('http://localhost:3006/profiles')
-  .then(response =>
-    response.json()
-  ).then(data => {
-    const profiles = data ? data.map(value => JSON.parse(value['info'])) : [];
+const fetchData = async () => {
+  const resources = await fetch('http://localhost:3006/resources');
+  const resourcesJson = await resources.json()
+  const resData = resourcesJson.map(item => {
+    return {...item.info, protocol: item.protocol}
+  })
+  const profiles = await fetch('http://localhost:3006/profiles');
+  const profilesJson = await profiles.json()
+  const profilesInfo = profilesJson ? profilesJson.map(value => value['info']) : [];
+  return { res: resData, profiles: profilesInfo };
+}
+
+fetchData()
+  .then(data => {
     setGlobal({
       name: '',
       description: '',
       manufacturer: '',
       model: '',
       labels: [],
-      deviceResources: [],
+      deviceResources: data.res,
+      selectedResource: [],
       deviceCommands: [],
       coreCommands: [],
       open: false,
-      profiles: profiles
-    });
+      profiles: data.profiles?data.profiles:[]
+    })
   })
+  .catch(err => console.log('Err:', err))
 
 ReactDOM.render(<App />, document.getElementById('root'));
 
@@ -31,12 +42,3 @@ ReactDOM.render(<App />, document.getElementById('root'));
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
-/*
-    {
-      name: 'test',
-      description: 'test description',
-      manufacturer: 'test',
-      model: 'test',
-      labels: [ 'test', 'modbus' ]
-    }
-*/

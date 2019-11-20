@@ -70,15 +70,17 @@ const ProfileInfo = () => {
             Label
           </InputLabel>
         </div>
-        {labels.map((label, labelIndex) =>
-          <Chip
-            key={label}
-            label={label}
-            onDelete={() => handleDelete(labelIndex)}
-            color="primary"
-            variant="outlined"
-          />
-        )}
+        <div className="chipSection">
+          {labels.map((label, labelIndex) =>
+            <Chip
+              key={label}
+              label={label}
+              onDelete={() => handleDelete(labelIndex)}
+              color="primary"
+              variant="outlined"
+            />
+          )}
+        </div>
         <TextField
           label="Type label to add..."
           value={label}

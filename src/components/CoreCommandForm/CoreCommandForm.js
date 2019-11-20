@@ -1,25 +1,27 @@
 import { useState, useEffect } from 'react';
-import React, { setGlobal, useDispatch, useGlobal } from 'reactn';
+import React, { useDispatch, useGlobal } from 'reactn';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
-import FormControl from '@material-ui/core/FormControl';
-import Divider from '@material-ui/core/Divider';
+import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
+import Chip from '@material-ui/core/Chip';
 import Fab from '@material-ui/core/Fab';
-import TextField from '@material-ui/core/TextField';
+import FormControl from '@material-ui/core/FormControl';
 import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
-import Chip from '@material-ui/core/Chip';
-import AddIcon from '@material-ui/icons/Add';
-import NativeSelect from '@material-ui/core/NativeSelect';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+import TextField from '@material-ui/core/TextField';
+
 import MaterialTable from 'material-table';
 
+import Combobox from 'react-widgets/lib/Combobox'
+
+import 'react-widgets/dist/css/react-widgets.css';
+import Grid from "@material-ui/core/Grid";
 
 const useStyles = makeStyles(theme => ({
   dialog: {
@@ -69,14 +71,6 @@ const MenuProps = {
     },
   },
 };
-function getStyles(name, personName, theme) {
-  return {
-    fontWeight:
-      personName.indexOf(name) === -1
-        ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium,
-  };
-}
 
 const CoreCommandForm = ({ rowData }) => {
   const classes = useStyles();
@@ -87,31 +81,49 @@ const CoreCommandForm = ({ rowData }) => {
 
   const initialState = {
     name: '',    
-    getPath: '/api/v1/device/{deviceId}/',  
-    getResps: [],
-    putPath: '/api/v1/device/{deviceId}/',
+    path: '/api/v1/device/{deviceId}/',
+    //getResps: [],
+    getResps: [{code: '200', description: 'Success', expectedValues: []},
+               {code: '500', description: 'Failed transaction', expectedValues: []}],
     paramNames: [],
-    putResps: [],
+    putResps: [{code: '200', description: 'Success', expectedValues: []},
+               {code: '500', description: 'Failed transaction', expectedValues: []}]
   };
 
   const [state, setState] = useState(initialState);  
-  const { name, getPath, getResps, putPath, paramNames, putResps } = state;      
-  
+  const { name, path, getResps, paramNames, putResps } = state;
   const [ rowIndex, setRowIndex ] = useState(-1);
+
+  const [ selectedResource ] = useGlobal('selectedResource');
+  const [ deviceCommands ] = useGlobal('deviceCommands');
+
+  const resourceNames = selectedResource.map(data => ({ name: data, source: 'Device Resource' }))
+  const devCmdNames = deviceCommands.map(data => ({name: data.name, source: 'Device Command' }))
+  const cmdNames =   resourceNames.concat(devCmdNames);
 
   useEffect(() => {    
     if (rowData) {
       setState({
         name: rowData.name,
-        getPath: rowData['get']['path'],
+        path: rowData['get']['path'],
         getResps: rowData['get']['responses'],
-        putPath: rowData['put']['path'],
         paramNames: rowData['put']['parameterNames'],
         putResps: rowData['put']['responses'],
       });
       setRowIndex(rowData['tableData']['id']);
     }
   }, [rowData]);
+
+  const handleCmdNameChange = (value) => {
+    let setParams;
+    if (value.source === 'Device Command') {
+      const selectedDC = deviceCommands.find(dc => dc.name === value.name)
+      setParams = selectedDC.set.map(set=>set.parameter)
+    }
+    else
+      setParams = [ value.name ]
+    setState({ ...state, 'name': value.name, path: path.slice(0, path.lastIndexOf('/') + 1).concat(value.name), paramNames: setParams })
+  }
 
   const handleChange = (name, event) => {    
     setState({ ...state, [name]: event.target.value})
@@ -164,7 +176,7 @@ const CoreCommandForm = ({ rowData }) => {
         []
       );
       const putRspData = putResps.reduce((accumulator, resp) => {
-           accumulator.push({code:resp.code, description: resp.description, expectedValues: resp.expectedValues})
+           accumulator.push({code:resp.code, description: resp.description, expectedValues: []})
            return accumulator;
         },
         []
@@ -174,27 +186,26 @@ const CoreCommandForm = ({ rowData }) => {
         newCoreCommand = [...coreCommands, {
             name: name,
             get: {
-              path: getPath,
+              path: path,
               responses: getRspData
             },
             put: {
-              path: putPath,
+              path: path,
               parameterNames: paramNames,
               responses: putRspData
             },        
           }];
       }
       else {
-      
         newCoreCommand = [...coreCommands.slice(0, rowIndex),
           {
             name: name,
             get: {
-              path: getPath,
+              path: path,
               responses: getRspData
             },
             put: {
-              path: putPath,
+              path: path,
               parameterNames: paramNames,
               responses: putRspData
             },        
@@ -211,8 +222,6 @@ const CoreCommandForm = ({ rowData }) => {
     setState({ ...initialState }); handleClose();
   }
 
-  const [ coreCommands ] = useGlobal('coreCommands');  
-
   return (
     <div>
       <Dialog        
@@ -223,20 +232,28 @@ const CoreCommandForm = ({ rowData }) => {
         aria-labelledby="max-width-dialog-title"
       >
         <DialogTitle id="max-width-dialog-title">Core Command</DialogTitle>
-        <DialogContent>        
-          <TextField
-            label="Core Command Name"
-            className={classes.textField}
+        <DialogContent>
+          <div className="selectDiv">
+            <InputLabel shrink htmlFor="label-name">
+                Select Device Resource or Device Command
+            </InputLabel>
+          </div>
+          <Combobox
+            data={cmdNames}
+            caseSensitive={false}
+            textField='name'
+            valueField='name'
+            filter='contains'
+            onChange={handleCmdNameChange}
+            groupBy='source'
             value={name}
-            onChange={(evt) => handleChange('name', evt)}
-            margin="normal"
-          />
+            />
           <h4>Get Methods</h4>
           <TextField
             label="Path"
             className={classes.textField}
-            value={getPath}
-            onChange={(evt) => handleChange('getPath', evt)}
+            value={path}
+            onChange={(evt) => handleChange('path', evt)}
             margin="normal"
           />
           <MaterialTable
@@ -249,7 +266,6 @@ const CoreCommandForm = ({ rowData }) => {
                     setTimeout(() => {
                       resolve();
                       const data = [...getResps];
-                      console.log('getResps data: ', data)
                       data.push(newData);
                       setState({ ...state, getResps: data });
                     }, 100);
@@ -278,34 +294,24 @@ const CoreCommandForm = ({ rowData }) => {
           <TextField
             label="Path"
             className={classes.textField}
-            value={putPath}
-            onChange={(evt) => handleChange('putPath', evt)}
+            value={path}
+            onChange={(evt) => handleChange('path', evt)}
             margin="normal"
           />
           <FormControl className={classes.formControl}>
             <InputLabel shrink htmlFor="param-name">
               Parameter Names
             </InputLabel>
-            <Select
-              multiple
-              value={paramNames}              
-              onChange={(evt) => handleChange('paramNames', evt)}
-              input={<Input id="param-name" />}
-              renderValue={selected => (
-                <div className={classes.chips}>
-                  {selected.map(value => (
-                    <Chip key={value} label={value} className={classes.chip} />
-                  ))}
-                </div>
+            <div className="chipSection">
+              {paramNames.map((label) =>
+                <Chip
+                  key={label}
+                  label={label}
+                  color="primary"
+                  variant="outlined"
+                />
               )}
-              MenuProps={MenuProps}
-            >
-              {deviceResources.map(deviceResource => (
-                <MenuItem key={deviceResource.name} value={deviceResource.name} style={{fontWeight: theme.typography.fontWeightMedium}}>
-                  {deviceResource.name}
-                </MenuItem>
-              ))}
-            </Select>    
+            </div>
           </FormControl>
           <MaterialTable
               title="HTTP Responses"

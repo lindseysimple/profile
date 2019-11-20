@@ -64,7 +64,6 @@ const DeviceCommandList = () => {
           }
         }}
         detailPanel={rowData => {
-          console.log('rowData: ', rowData);
           return (
             <div className="rowDetail">
               {rowData['get'].length > 0 &&

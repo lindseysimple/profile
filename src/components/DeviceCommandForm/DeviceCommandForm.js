@@ -3,12 +3,10 @@ import React, { setGlobal, useDispatch, useGlobal } from 'reactn';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 import FormControl from '@material-ui/core/FormControl';
-import Divider from '@material-ui/core/Divider';
 import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Select from '@material-ui/core/Select';
@@ -66,11 +64,6 @@ const MenuProps = {
     },
   },
 };
-function getStyles(name, personName, theme) {
-  return {
-    fontWeight: theme.typography.fontWeightRegular        
-  };
-}
 
 const DeviceCommandForm = ({ rowData }) => {  
   const classes = useStyles();
@@ -86,8 +79,8 @@ const DeviceCommandForm = ({ rowData }) => {
   const [ rowIndex, setRowIndex ] = useState(-1);
   
   const [ deviceResources ] = useGlobal('deviceResources');
+  const [ selectedResource ] = useGlobal('selectedResource');
   const [ open, setOpen ] = useGlobal('open');
-  const [ deviceCommands ] = useGlobal('deviceCommands');
 
   useEffect(() => {    
     if (rowData) {
@@ -175,7 +168,7 @@ const DeviceCommandForm = ({ rowData }) => {
                 margin="normal"
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12}>
               <h4>Set Methods</h4>
               <FormControl className={classes.formControl}>
                 <InputLabel htmlFor="select-multiple-chip">Device Resource</InputLabel>
@@ -193,15 +186,15 @@ const DeviceCommandForm = ({ rowData }) => {
                   )}
                   MenuProps={MenuProps}
                 >
-                  {deviceResources.map(deviceResource => (
-                    <MenuItem key={deviceResource.name} value={deviceResource.name} style={{fontWeight: theme.typography.fontWeightRegular}}>
-                      {deviceResource.name}
-                    </MenuItem>
+                  {selectedResource.map(deviceResource => (
+                      <MenuItem key={deviceResource} value={deviceResource} style={{fontWeight: theme.typography.fontWeightRegular}}>
+                        {deviceResource}
+                      </MenuItem>
                   ))}
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12}>
               <h4>Get Methods</h4>
               <FormControl className={classes.formControl}>
                 <InputLabel htmlFor="get-resource-name">Device Resource</InputLabel>
@@ -219,9 +212,9 @@ const DeviceCommandForm = ({ rowData }) => {
                   )}
                   MenuProps={MenuProps}
                 >
-                  {deviceResources.map(deviceResource => (
-                    <MenuItem key={deviceResource.name} value={deviceResource.name} style={{fontWeight: theme.typography.fontWeightRegular}}>
-                      {deviceResource.name}
+                  {selectedResource.map(deviceResource => (
+                    <MenuItem key={deviceResource} value={deviceResource} style={{fontWeight: theme.typography.fontWeightRegular}}>
+                      {deviceResource}
                     </MenuItem>
                   ))}
                 </Select>

@@ -7,20 +7,17 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import Fab from '@material-ui/core/Fab';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import NativeSelect from '@material-ui/core/NativeSelect';
-import Divider from '@material-ui/core/Divider';
 import BackIcon from '@material-ui/icons/ArrowBackOutlined';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 
 import CoreCommandList from '../CoreCommandList/CoreCommandList';
 import DeviceCommandList from '../DeviceCommandList/DeviceCommandList';
-import DeviceResourceList from '../DeviceResourceList/DeviceResourceList';
+import ResourceSelect from '../ResourceSelect/ResourceSelect';
 import ProfileInfo from '../ProfileInfo/ProfileInfo';
 
 const useStyles = makeStyles(theme => ({
@@ -44,7 +41,7 @@ const useStyles = makeStyles(theme => ({
 
 const getSteps = () => ['Profile Type', 'Profile Information', 'Device Resource', 'Device Command', 'Core Command']
 
-export default function HorizontalLabelPositionBelowStepper({ backToList, rowIndex }) {
+export default function ProfileForm({ backToList, rowIndex }) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = useState(0);
   const steps = getSteps();
@@ -52,10 +49,11 @@ export default function HorizontalLabelPositionBelowStepper({ backToList, rowInd
   const [ profiles, setProfiles ] = useGlobal('profiles');
 
   const updateProfile = () => {
-    const { name, description, model, manufacturer, labels, deviceResources, deviceCommands, coreCommands } = getGlobal();
+    const { name, description, model, manufacturer, labels, deviceResources, selectedResource, deviceCommands, coreCommands } = getGlobal();
 
-    const deviceResourcesData = deviceResources.map(dr => {
-      return { name: dr.name, description: dr.description, attributes: dr.attributes, properties: dr.properties }
+    const deviceResourcesData = selectedResource.map(item => {
+      const res = deviceResources.find(obj => obj.name === item)
+      return { name: res.name, description: res.description, attributes: res.attributes, properties: res.properties }
     })
 
     const deviceCommandsData = deviceCommands.map(dc => {
@@ -100,7 +98,7 @@ export default function HorizontalLabelPositionBelowStepper({ backToList, rowInd
         referrer: 'no-referrer', // no-referrer, *client
         body: JSON.stringify(newProfile), // body data type must match "Content-Type" header
       })
-      .then(response => response.json()); 
+      .then(response => response.json());
     }
   }
 
@@ -140,7 +138,7 @@ export default function HorizontalLabelPositionBelowStepper({ backToList, rowInd
       case 2:
         return (
           <div>
-            <DeviceResourceList />            
+            <ResourceSelect />
           </div>
         );
       case 3:
