@@ -10,7 +10,7 @@
     "downloadjs": "^1.4.7",
     "express": "^4.17.1",
     "js-yaml": "^3.13.1",
-    "jszip": "^3.2.2",
+    "jszip": "^3.7.0",
     "knex": "^0.19.3",
     "material-table": "^1.50.0",
     "pg": "^7.12.1",
